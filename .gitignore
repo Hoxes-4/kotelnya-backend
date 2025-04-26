@@ -1,2 +1,4 @@
+# Игнорировать node_modules и .env
+node_modules/
 .env
 .env*
