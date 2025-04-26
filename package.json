@@ -1,0 +1,23 @@
+{
+  "name": "dir",
+  "version": "1.0.0",
+  "description": "back",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "node",
+    "backend",
+    "express",
+    "api"
+  ],
+  "author": "Erebus",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2"
+  }
+}
