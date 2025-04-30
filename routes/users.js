@@ -15,3 +15,8 @@ router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
 module.exports = router;
+
+const { getUserProjects } = require('../controllers/userController');
+
+// GET /api/users/:id/projects
+router.get('/:id/projects', getUserProjects);

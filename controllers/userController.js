@@ -43,3 +43,21 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Ошибка удаления пользователя', error: error.message });
   }
 };
+
+const Project = require('../models/Project');
+
+// 📤 Получить все проекты пользователя
+exports.getUserProjects = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const projects = await Project.find({ users: userId })
+      .populate('users', '-password')
+      .populate('boards')
+      .populate('notes');
+
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка получения проектов пользователя', error: err.message });
+  }
+};
