@@ -1,25 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Board = require('../models/Board');
+const {
+  getBoardById,
+  updateBoard,
+  deleteBoard
+} = require('../controllers/boardController');
+const auth = require('../middlewares/authMiddleware');
 
-router.get('/:id', async (req, res) => {
-  try {
-    const board = await Board.findById(req.params.id)
-      .populate('tasks')
-      .populate('columns');
-    res.json(board);
-  } catch (err) {
-    res.status(500).json({ message: 'Ошибка получения доски' });
-  }
-});
+router.use(auth);
 
-router.post('/', async (req, res) => {
-  try {
-    const board = await Board.create(req.body);
-    res.status(201).json(board);
-  } catch (err) {
-    res.status(400).json({ message: 'Ошибка создания доски' });
-  }
-});
+// GET /api/boards/:id
+router.get('/:id', getBoardById);
+
+// PUT /api/boards/:id
+router.put('/:id', updateBoard);
+
+// DELETE /api/boards/:id
+router.delete('/:id', deleteBoard);
 
 module.exports = router;

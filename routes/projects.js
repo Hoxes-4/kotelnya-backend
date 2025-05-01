@@ -30,3 +30,17 @@ const {
   // DELETE /api/projects/:id/users/:userId
   router.delete('/:id/users/:userId', removeUserFromProject);
   
+
+const { deleteProject } = require('../controllers/projectController');
+
+// DELETE /api/projects/:id
+router.delete('/:id', deleteProject);
+
+
+const { createBoard, getBoardsByProject } = require('../controllers/boardController');
+
+// GET /api/projects/:id/boards
+router.get('/:id/boards', getBoardsByProject);
+
+// POST /api/projects/:id/boards
+router.post('/:id/boards', createBoard);
