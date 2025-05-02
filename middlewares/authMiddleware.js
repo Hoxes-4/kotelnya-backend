@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// 🔐 Middleware: проверка токена
+
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Проверка заголовка
+  
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Нет токена' });
   }
