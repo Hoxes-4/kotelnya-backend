@@ -1,14 +1,28 @@
 const Board = require('../models/Board');
 const BoardTask = require('../models/BoardTask');
+const BoardColumn = require('../models/BoardColumn');
 
 exports.createTask = async (req, res) => {
   try {
     const boardId = req.params.boardId;
-    const task = await BoardTask.create(req.body);
+    const { title, description, dueDate, assignee, columnId } = req.body;
+
+    const task = await BoardTask.create({
+      title,
+      description,
+      dueDate,
+      assignee,
+    });
 
     await Board.findByIdAndUpdate(boardId, {
       $push: { tasks: task._id }
     });
+
+    if (columnId) {
+      await BoardColumn.findByIdAndUpdate(columnId, {
+        $push: { tasks: task._id }
+      });
+    }
 
     res.status(201).json(task);
   } catch (err) {

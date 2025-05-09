@@ -1,7 +1,6 @@
 const BoardColumn = require('../models/BoardColumn');
 const Board = require('../models/Board');
 
-// 📥 Создать колонку
 exports.createColumn = async (req, res) => {
   try {
     const boardId = req.params.boardId;
@@ -17,7 +16,6 @@ exports.createColumn = async (req, res) => {
   }
 };
 
-// 📤 Получить колонку
 exports.getColumnById = async (req, res) => {
   try {
     const column = await BoardColumn.findById(req.params.id).populate('tasks');
@@ -32,7 +30,6 @@ exports.getColumnById = async (req, res) => {
   }
 };
 
-// ✏️ Обновить колонку
 exports.updateColumn = async (req, res) => {
   try {
     const column = await BoardColumn.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -47,16 +44,26 @@ exports.updateColumn = async (req, res) => {
   }
 };
 
-// 🗑 Удалить колонку
 exports.deleteColumn = async (req, res) => {
   try {
-    const column = await BoardColumn.findByIdAndDelete(req.params.id);
+    const columnId = req.params.id;
 
-    if (!column) {
+    const deletedColumn = await BoardColumn.findByIdAndDelete(columnId);
+    if (!deletedColumn) {
       return res.status(404).json({ message: 'Колонка не найдена' });
     }
 
-    res.json({ message: 'Колонка удалена' });
+    await Board.updateMany(
+      { columns: columnId },
+      {
+        $pull: {
+          columns: columnId,
+          columnOrder: columnId.toString(),
+        },
+      }
+    );
+
+    res.json({ message: 'Колонка и все ссылки удалены' });
   } catch (err) {
     res.status(500).json({ message: 'Ошибка удаления колонки', error: err.message });
   }
