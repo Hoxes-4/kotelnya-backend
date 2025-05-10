@@ -45,6 +45,7 @@ exports.deleteUser = async (req, res) => {
 };
 
 const Project = require('../models/Project');
+const Note = require('../models/Note');
 
 // 📤 Получить все проекты пользователя
 exports.getUserProjects = async (req, res) => {
