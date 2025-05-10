@@ -7,7 +7,7 @@ const projectSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: 'active',
+    default: 'В процессе',
   },
   users: [
     {

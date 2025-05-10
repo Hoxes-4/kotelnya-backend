@@ -2,10 +2,11 @@ const Project = require('../models/Project');
 
 exports.createProject = async (req, res) => {
   try {
-    const { title, users } = req.body;
+    const { title, users, status } = req.body;
 
     const project = await Project.create({
       title,
+      status,
       users: users || [req.user.id], // если юзеров не указали — владелец по умолчанию
     });
 

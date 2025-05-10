@@ -1,4 +1,5 @@
 const Board = require('../models/Board');
+const BoardColumn = require('../models/BoardColumn')
 const Project = require('../models/Project');
 
 exports.createBoard = async (req, res) => {
@@ -32,6 +33,22 @@ exports.getBoardsByProject = async (req, res) => {
   }
 };
 
+exports.getNotesByProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id).populate('notes');
+
+
+    if (!project) {
+      return res.status(404).json({ message: 'Проект не найден' });
+    }
+
+    res.json(project.notes);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка получения заметок', error: err.message });
+  }
+
+}
+
 exports.getBoardById = async (req, res) => {
     try {
       const board = await Board.findById(req.params.id)
@@ -50,15 +67,29 @@ exports.getBoardById = async (req, res) => {
   
   exports.updateBoard = async (req, res) => {
     try {
-      const board = await Board.findByIdAndUpdate(req.params.id, req.body, {
+      const { columns } = req.body;
+      const board = await Board.findByIdAndUpdate(req.params.id, { title: req.body.title, columnOrder: req.body.columnOrder, }, {
         new: true,
       }).populate('tasks').populate('columns');
+      
   
       if (!board) {
         return res.status(404).json({ message: 'Доска не найдена' });
       }
+
+      await Promise.all(columns.map(col => {
+        return BoardColumn.findByIdAndUpdate(
+          col._id,
+          { tasks: col.tasks },
+          { new: true }
+        );
+      }));
+
+      const updated = await Board.findById(req.params.id)
+        .populate('tasks')
+        .populate('columns');
   
-      res.json(board);
+      res.json(updated);
     } catch (err) {
       res.status(500).json({ message: 'Ошибка обновления доски', error: err.message });
     }
