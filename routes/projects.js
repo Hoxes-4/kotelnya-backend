@@ -47,3 +47,8 @@ router.post('/:id/boards', createBoard);
 
 // GET /api/projects/:id/notes
 router.get('/:id/notes', getNotesByProject);
+
+const { addUserToProject } = require('../controllers/projectController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+router.post('/:id/users', authMiddleware, addUserToProject);

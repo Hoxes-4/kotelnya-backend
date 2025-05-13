@@ -60,13 +60,19 @@ exports.updateTask = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const task = await BoardTask.findByIdAndDelete(req.params.id);
+    const taskId = req.params.id;
 
+    const task = await BoardTask.findByIdAndDelete(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Задача не найдена' });
     }
 
-    res.json({ message: 'Задача удалена' });
+    await BoardColumn.updateMany(
+      { tasks: taskId },
+      { $pull: { tasks: taskId } }
+    );
+
+    res.json({ message: 'Задача удалена и исключена из всех колонок' });
   } catch (err) {
     res.status(500).json({ message: 'Ошибка удаления задачи', error: err.message });
   }

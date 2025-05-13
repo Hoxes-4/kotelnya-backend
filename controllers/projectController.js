@@ -56,25 +56,6 @@ exports.updateProject = async (req, res) => {
     }
   };
 
-exports.addUserToProject = async (req, res) => {
-    try {
-      const project = await Project.findById(req.params.id);
-      const userId = req.body.userId;
-  
-      if (!project) return res.status(404).json({ message: 'Проект не найден' });
-  
-      if (!project.users.includes(userId)) {
-        project.users.push(userId);
-        await project.save();
-      }
-  
-      const updated = await Project.findById(req.params.id).populate('users', '-password');
-      res.json(updated);
-    } catch (err) {
-      res.status(500).json({ message: 'Ошибка добавления пользователя', error: err.message });
-    }
-  };
-  
   exports.removeUserFromProject = async (req, res) => {
     try {
       const project = await Project.findById(req.params.id);
@@ -105,3 +86,50 @@ exports.addUserToProject = async (req, res) => {
       res.status(500).json({ message: 'Ошибка удаления проекта', error: err.message });
     }
   };
+
+const Project = require('../models/Project');
+const User = require('../models/User');
+
+exports.addUserToProject = async (req, res) => {
+  const { userId } = req.body;
+  const projectId = req.params.id;
+
+  try {
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: 'Проект не найден' });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
+
+    if (project.users.includes(userId)) {
+      return res.status(400).json({ message: 'Пользователь уже в проекте' });
+    }
+
+    project.users.push(userId);
+    await project.save();
+
+    res.status(200).json({ message: 'Пользователь добавлен в проект' });
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка добавления пользователя', error: err.message });
+  }
+};
+
+const Board = require('../models/Board');
+const Note = require('../models/Note');
+
+exports.deleteProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Проект не найден' });
+
+    await Board.deleteMany({ _id: { $in: project.boards } });
+
+    await Note.deleteMany({ _id: { $in: project.notes } });
+
+    await project.deleteOne();
+
+    res.json({ message: 'Проект и все связанные доски и заметки удалены' });
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка удаления проекта', error: err.message });
+  }
+};

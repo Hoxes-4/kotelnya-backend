@@ -47,7 +47,6 @@ exports.deleteUser = async (req, res) => {
 const Project = require('../models/Project');
 const Note = require('../models/Note');
 
-// 📤 Получить все проекты пользователя
 exports.getUserProjects = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -60,5 +59,22 @@ exports.getUserProjects = async (req, res) => {
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка получения проектов пользователя', error: err.message });
+  }
+};
+
+const User = require('../models/User');
+exports.searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) return res.json([]);
+
+    const regex = new RegExp(query, 'i'); // i = ignore case
+    const users = await User.find({
+      $or: [{ username: regex }, { email: regex }],
+    }).select('-password'); // не возвращаем пароль
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка поиска пользователей', error: err.message });
   }
 };
