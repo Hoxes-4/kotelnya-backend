@@ -24,3 +24,19 @@ const { searchUsers } = require('../controllers/userController');
 
 // GET /api/users/search?query=...
 router.get('/search', searchUsers);
+
+const upload = require('../middlewares/uploadMiddleware');
+
+router.put('/:id/avatar', auth, upload.single('avatar'), async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { avatarUrl: `/uploads/${req.file.filename}` },
+      { new: true }
+    );
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка загрузки аватара', error: err.message });
+  }
+});

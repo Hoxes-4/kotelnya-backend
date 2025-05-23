@@ -16,6 +16,10 @@ const noteSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+    imageUrl: {
+    type: String,
+    default: "В процессе",
+  },
   updatedAt: {
     type: Date,
     default: Date.now,

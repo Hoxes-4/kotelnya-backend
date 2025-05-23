@@ -22,4 +22,20 @@ router.put('/notes/:id', updateNote);
 // DELETE /api/notes/:id
 router.delete('/notes/:id', deleteNote);
 
+const upload = require('../middlewares/uploadMiddleware');
+
+router.put('/:id/image', auth, upload.single('image'), async (req, res) => {
+  try {
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { imageUrl: `/uploads/${req.file.filename}` },
+      { new: true }
+    );
+
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка загрузки изображения в заметку', error: err.message });
+  }
+});
+
 module.exports = router;

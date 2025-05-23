@@ -18,6 +18,7 @@ app.use('/api/boards', require('./routes/boards'));
 app.use('/api', require('./routes/tasks'));
 app.use('/api', require('./routes/columns'));
 app.use('/api', require('./routes/notes'));
+app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.send('✅ Сервер работает! Добро пожаловать в API');

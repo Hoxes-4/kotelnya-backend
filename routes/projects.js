@@ -52,3 +52,19 @@ const { addUserToProject } = require('../controllers/projectController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/:id/users', authMiddleware, addUserToProject);
+
+const upload = require('../middlewares/uploadMiddleware');
+
+router.put('/:id/image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      { imageUrl: `/uploads/${req.file.filename}` },
+      { new: true }
+    );
+
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка загрузки изображения проекта', error: err.message });
+  }
+});

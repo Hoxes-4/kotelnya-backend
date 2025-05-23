@@ -9,6 +9,10 @@ const projectSchema = new mongoose.Schema({
     type: String,
     default: 'В процессе',
   },
+  imageUrl: {
+    type: String,
+    default: "В процессе",
+  },
   users: [
     {
       type: mongoose.Schema.Types.ObjectId,
