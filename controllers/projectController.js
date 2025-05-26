@@ -1,4 +1,8 @@
 const Project = require('../models/Project');
+const User = require('../models/User');
+const Board = require('../models/Board');
+const Note = require('../models/Note');
+const mongoose = require('mongoose');
 
 exports.createProject = async (req, res) => {
   const { title } = req.body;

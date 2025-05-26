@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById, updateUser, deleteUser,searchUsers } = require('../controllers/userController');
+const { getUserById, updateUser, deleteUser,searchUsers, getUserProjects } = require('../controllers/userController');
 const auth = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware');
+const User = require('../models/User');
+
 router.use(auth);
 
 // GET /api/users/search?query=...
@@ -16,14 +19,8 @@ router.put('/:id', updateUser);
 // DELETE /api/users/:id
 router.delete('/:id', deleteUser);
 
-module.exports = router;
-
-const { getUserProjects } = require('../controllers/userController');
-
 // GET /api/users/:id/projects
 router.get('/:id/projects', getUserProjects);
-
-const upload = require('../middlewares/uploadMiddleware');
 
 router.put('/:id/avatar', auth, upload.single('avatar'), async (req, res) => {
   try {
@@ -38,3 +35,5 @@ router.put('/:id/avatar', auth, upload.single('avatar'), async (req, res) => {
     res.status(500).json({ message: 'Ошибка загрузки аватара', error: err.message });
   }
 });
+
+module.exports = router;
