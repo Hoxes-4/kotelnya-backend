@@ -4,6 +4,9 @@ const { getUserById, updateUser, deleteUser } = require('../controllers/userCont
 const auth = require('../middlewares/authMiddleware');
 router.use(auth);
 
+// GET /api/users/search?query=...
+router.get('/search', searchUsers);
+
 // GET /api/users/:id
 router.get('/:id', getUserById);
 
@@ -21,9 +24,6 @@ const { getUserProjects } = require('../controllers/userController');
 router.get('/:id/projects', getUserProjects);
 
 const { searchUsers } = require('../controllers/userController');
-
-// GET /api/users/search?query=...
-router.get('/search', searchUsers);
 
 const upload = require('../middlewares/uploadMiddleware');
 

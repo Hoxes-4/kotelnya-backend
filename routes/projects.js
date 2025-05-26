@@ -49,7 +49,7 @@ router.post('/:id/boards', createBoard);
 router.get('/:id/notes', getNotesByProject);
 
 const { addUserToProject } = require('../controllers/projectController');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/:id/users', authMiddleware, addUserToProject);
 

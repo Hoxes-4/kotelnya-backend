@@ -73,20 +73,6 @@ exports.updateProject = async (req, res) => {
     }
   };
   
-  exports.deleteProject = async (req, res) => {
-    try {
-      const project = await Project.findByIdAndDelete(req.params.id);
-  
-      if (!project) {
-        return res.status(404).json({ message: 'Проект не найден' });
-      }
-  
-      res.json({ message: 'Проект удалён успешно' });
-    } catch (err) {
-      res.status(500).json({ message: 'Ошибка удаления проекта', error: err.message });
-    }
-  };
-
 const Project = require('../models/Project');
 const User = require('../models/User');
 
