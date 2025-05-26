@@ -19,7 +19,32 @@ const userSchema = new mongoose.Schema({
   avatarUrl: {
     type: String,
     default: '',
-  },
+  },projectInvitations: [
+    {
+      projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: true,
+      },
+      projectName: {
+        type: String,
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending',
+      },
+      invitedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      invitedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 }, { timestamps: true });
 
 // Хэшируем пароль перед сохранением
