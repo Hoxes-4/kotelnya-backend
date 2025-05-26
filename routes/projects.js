@@ -12,8 +12,6 @@ router.post('/', createProject);
 // GET /api/projects/:id
 router.get('/:id', getProjectById);
 
-module.exports = router;
-
 const { updateProject } = require('../controllers/projectController');
 
 // PUT /api/projects/:id
@@ -70,3 +68,5 @@ router.put('/:id/image', authMiddleware, upload.single('image'), async (req, res
     res.status(500).json({ message: 'Ошибка загрузки изображения проекта', error: err.message });
   }
 });
+
+module.exports = router;
