@@ -62,7 +62,6 @@ exports.getUserProjects = async (req, res) => {
   }
 };
 
-const User = require('../models/User');
 exports.searchUsers = async (req, res) => {
   try {
     const { query } = req.query;

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById, updateUser, deleteUser } = require('../controllers/userController');
+const { getUserById, updateUser, deleteUser,searchUsers } = require('../controllers/userController');
 const auth = require('../middlewares/authMiddleware');
 router.use(auth);
 
@@ -22,8 +22,6 @@ const { getUserProjects } = require('../controllers/userController');
 
 // GET /api/users/:id/projects
 router.get('/:id/projects', getUserProjects);
-
-const { searchUsers } = require('../controllers/userController');
 
 const upload = require('../middlewares/uploadMiddleware');
 
