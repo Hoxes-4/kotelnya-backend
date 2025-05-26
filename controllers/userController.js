@@ -50,12 +50,17 @@ const Note = require('../models/Note');
 exports.getUserProjects = async (req, res) => {
   try {
     const userId = req.params.id;
-
-    const projects = await Project.find({ users: userId })
-      .populate('users', '-password')
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const projects = await Project.find({ "users.userId": userObjectId }) 
+      .populate({
+        path: 'users.userId',
+        model: 'User',
+        select: 'username email avatarUrl',
+      })
       .populate('boards')
-      .populate('notes');
-
+      .populate('notes')
+      .lean()
+      
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка получения проектов пользователя', error: err.message });
