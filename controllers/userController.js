@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 exports.getUserById = async (req, res) => {
   try {
@@ -60,7 +61,7 @@ exports.getUserProjects = async (req, res) => {
       .populate('boards')
       .populate('notes')
       .lean()
-      
+
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка получения проектов пользователя', error: err.message });

@@ -1,4 +1,3 @@
-// controllers/invitationController.js
 const User = require('../models/User');
 const Project = require('../models/Project');
 

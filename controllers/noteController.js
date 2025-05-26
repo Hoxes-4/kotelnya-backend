@@ -1,7 +1,6 @@
 const Note = require('../models/Note');
 const Project = require('../models/Project');
 
-// 📥 Создать заметку и добавить в проект
 exports.createNote = async (req, res) => {
   try {
     const { title, markdownContent } = req.body;
@@ -22,7 +21,6 @@ exports.createNote = async (req, res) => {
   }
 };
 
-// 📤 Получить заметку по ID
 exports.getNoteById = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id).populate('author', '-password');
@@ -37,7 +35,6 @@ exports.getNoteById = async (req, res) => {
   }
 };
 
-// ✏️ Обновить заметку
 exports.updateNote = async (req, res) => {
   try {
     const note = await Note.findByIdAndUpdate(
@@ -56,7 +53,6 @@ exports.updateNote = async (req, res) => {
   }
 };
 
-// 🗑 Удалить заметку
 exports.deleteNote = async (req, res) => {
   try {
     const note = await Note.findByIdAndDelete(req.params.id);
