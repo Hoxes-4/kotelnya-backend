@@ -15,8 +15,15 @@ const projectSchema = new mongoose.Schema({
   },
   users: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      role: {
+        type: String,
+        enum: ['owner', 'admin', 'member'],
+        default: 'member',
+      },
     },
   ],
   boards: [

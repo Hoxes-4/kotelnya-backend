@@ -1,7 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { createProject, getProjectById } = require('../controllers/projectController');
+const {
+  createProject,
+  getProjectById,
+  updateProject,
+  deleteProject,
+  addUserToProject, // Возможно, оставим, но основной способ добавления будет через invitations
+  removeUserFromProject,
+  changeUserRoleInProject, // Новый роут
+  getBoardsByProject,
+  getNotesByProject,
+} = require('../controllers/projectController');
 const auth = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware');
+const Project = require('../models/Project');
 
 // Все маршруты — защищённые
 router.use(auth);
@@ -12,59 +24,51 @@ router.post('/', createProject);
 // GET /api/projects/:id
 router.get('/:id', getProjectById);
 
-module.exports = router;
-
-const { updateProject } = require('../controllers/projectController');
-
 // PUT /api/projects/:id
 router.put('/:id', updateProject);
-
-const {
-    addUserToProject,
-    removeUserFromProject,
-  } = require('../controllers/projectController');
-  
-  // POST /api/projects/:id/users
-  router.post('/:id/users', addUserToProject);
-  
-  // DELETE /api/projects/:id/users/:userId
-  router.delete('/:id/users/:userId', removeUserFromProject);
-  
-
-const { deleteProject } = require('../controllers/projectController');
 
 // DELETE /api/projects/:id
 router.delete('/:id', deleteProject);
 
+// POST /api/projects/:id/users - Добавить пользователя
+router.post('/:id/users', addUserToProject);
 
-const { createBoard, getBoardsByProject, getNotesByProject } = require('../controllers/boardController');
+// DELETE /api/projects/:id/users/:userId - Удалить пользователя из проекта
+router.delete('/:id/users/:userId', removeUserFromProject);
+
+// PUT /api/projects/:id/users/:userId/role - Изменить роль пользователя в проекте
+router.put('/:id/users/:userId/role', changeUserRoleInProject);
+
 
 // GET /api/projects/:id/boards
 router.get('/:id/boards', getBoardsByProject);
 
-// POST /api/projects/:id/boards
+// POST /api/projects/:id/boards (создание доски для проекта)
+const { createBoard } = require('../controllers/boardController');
 router.post('/:id/boards', createBoard);
 
 // GET /api/projects/:id/notes
 router.get('/:id/notes', getNotesByProject);
 
-const { addUserToProject } = require('../controllers/projectController');
-const authMiddleware = require('../middlewares/authMiddleware');
-
-router.post('/:id/users', authMiddleware, addUserToProject);
-
-const upload = require('../middlewares/uploadMiddleware');
-
-router.put('/:id/image', authMiddleware, upload.single('image'), async (req, res) => {
+// Загрузка изображения проекта
+router.put('/:id/image', upload.single('image'), async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      { imageUrl: `/uploads/${req.file.filename}` },
-      { new: true }
-    );
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Проект не найден' });
+    }
 
+    const currentUserInProject = project.users.find(u => u.userId.equals(req.user.id));
+    if (!currentUserInProject || (currentUserInProject.role !== 'owner' && currentUserInProject.role !== 'admin')) {
+      return res.status(403).json({ message: 'Только владелец или администратор может загружать изображения проекта' });
+    }
+
+    project.imageUrl = `/uploads/${req.file.filename}`;
+    await project.save();
     res.json(project);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка загрузки изображения проекта', error: err.message });
   }
 });
+
+module.exports = router;
