@@ -17,11 +17,11 @@ const populateProject = (query) => {
 
 
 exports.createProject = async (req, res) => {
-  const { title } = req.body; 
+  const { title, status } = req.body;
   try {
     let newProject = new Project({
       title,
-      status: 'В процессе', 
+      status: status || 'В процессе',
       users: [{ userId: req.user.id, role: 'owner' }],
     });
     await newProject.save();
