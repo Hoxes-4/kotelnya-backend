@@ -53,7 +53,7 @@ exports.getNotesByProject = async (req, res) => {
   }
 };
 
-/* exports.getNoteById = async (req, res) => {
+exports.getNoteById = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id).populate('author', '-password');
 
@@ -65,7 +65,7 @@ exports.getNotesByProject = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Ошибка получения заметки', error: err.message });
   }
-}; */
+};
 
 exports.updateNote = async (req, res) => {
   try {

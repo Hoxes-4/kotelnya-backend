@@ -89,7 +89,7 @@ exports.getBoardsByProject = async (req, res) => {
   }
 };
 
-/* exports.getBoardById = async (req, res) => {
+exports.getBoardById = async (req, res) => {
   try {
     const boardId = req.params.id;
     let board = await populateBoard(Board.findById(boardId)).lean();
@@ -125,7 +125,7 @@ exports.getBoardsByProject = async (req, res) => {
     console.error("Ошибка получения доски:", err);
     res.status(500).json({ message: 'Ошибка получения доски', error: err.message });
   }
-}; */
+};
 
 exports.updateBoard = async (req, res) => {
   try {
