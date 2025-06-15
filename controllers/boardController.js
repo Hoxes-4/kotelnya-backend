@@ -48,7 +48,48 @@ exports.createBoard = async (req, res) => {
   }
 };
 
-exports.getBoardById = async (req, res) => {
+exports.getBoardsByProject = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+
+    const project = await Project.findById(projectId)
+      .populate({
+        path: 'boards',
+        populate: [
+          {
+            path: 'tasks',
+            populate: {
+              path: 'assignee',
+              model: 'User',
+              select: 'username email avatarUrl'
+            }
+          },
+          {
+            path: 'columns'
+          }
+        ]
+      });
+
+    if (!project) {
+      return res.status(404).json({ message: 'Проект не найден' });
+    }
+
+    // Проверяем членство пользователя в проекте
+    const isMember = project.users.some(userEntry =>
+      userEntry.userId.equals(req.user.id)
+    );
+    if (!isMember) {
+      return res.status(403).json({ message: 'У вас нет доступа к доскам этого проекта' });
+    }
+
+    res.json(project.boards); // Возвращаем только массив досок
+  } catch (err) {
+    console.error("Ошибка получения досок для проекта:", err);
+    res.status(500).json({ message: 'Ошибка получения досок для проекта', error: err.message });
+  }
+};
+
+/* exports.getBoardById = async (req, res) => {
   try {
     const boardId = req.params.id;
     let board = await populateBoard(Board.findById(boardId)).lean();
@@ -84,7 +125,7 @@ exports.getBoardById = async (req, res) => {
     console.error("Ошибка получения доски:", err);
     res.status(500).json({ message: 'Ошибка получения доски', error: err.message });
   }
-};
+}; */
 
 exports.updateBoard = async (req, res) => {
   try {

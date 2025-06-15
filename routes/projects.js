@@ -38,10 +38,16 @@ const { deleteProject } = require('../controllers/projectController');
 router.delete('/:id', deleteProject);
 
 
-const { createBoard } = require('../controllers/boardController');
+const { createBoard, getBoardsByProject, getNotesByProject } = require('../controllers/boardController');
+
+// GET /api/projects/:id/boards
+router.get('/:id/boards', getBoardsByProject);
 
 // POST /api/projects/:id/boards
 router.post('/:id/boards', createBoard);
+
+// GET /api/projects/:id/notes
+router.get('/:id/notes', getNotesByProject);
 
 const authMiddleware = require('../middlewares/authMiddleware');
 
