@@ -130,8 +130,8 @@ exports.removeUserFromProject = async (req, res) => {
     }
 
     const currentUserInProject = project.users.find(u => u.userId.equals(req.user.id));
-    if (!currentUserInProject || (currentUserInProject.role !== 'owner' && currentUserInProject.role !== 'admin')) {
-      return res.status(403).json({ message: 'У вас нет прав для удаления пользователей из этого проекта' });
+    if (!currentUserInProject) {
+      return res.status(403).json({ message: 'Вы не являетесь участником этого проекта' });
     }
 
     const userToRemove = project.users.find(u => u.userId.equals(userId));
@@ -139,12 +139,22 @@ exports.removeUserFromProject = async (req, res) => {
       return res.status(404).json({ message: 'Пользователь не является участником этого проекта' });
     }
 
-    if (userToRemove.userId.equals(req.user.id) && userToRemove.role === 'owner') {
-      return res.status(400).json({ message: 'Владелец не может удалить самого себя из проекта.' });
+    const isRemovingSelf = userToRemove.userId.equals(req.user.id);
+
+    // Проверка прав для удаления других пользователей
+    if (!isRemovingSelf) {
+      if (currentUserInProject.role !== 'owner' && currentUserInProject.role !== 'admin') {
+        return res.status(403).json({ message: 'У вас нет прав для удаления пользователей из этого проекта' });
+      }
+
+      if (currentUserInProject.role === 'admin' && (userToRemove.role === 'owner' || userToRemove.role === 'admin')) {
+        return res.status(403).json({ message: 'Администратор не может удалить владельца или другого администратора' });
+      }
     }
 
-    if (currentUserInProject.role === 'admin' && (userToRemove.role === 'owner' || userToRemove.role === 'admin')) {
-      return res.status(403).json({ message: 'Администратор не может удалить владельца или другого администратора.' });
+    // Владелец не может удалить самого себя
+    if (isRemovingSelf && userToRemove.role === 'owner') {
+      return res.status(400).json({ message: 'Владелец не может удалить самого себя из проекта' });
     }
 
     project.users = project.users.filter(u => !u.userId.equals(userId));
@@ -152,7 +162,11 @@ exports.removeUserFromProject = async (req, res) => {
 
     project = await populateProject(Project.findById(projectId)).lean();
 
-    res.status(200).json({ message: 'Пользователь успешно удален из проекта', project });
+    const message = isRemovingSelf 
+      ? 'Вы успешно покинули проект' 
+      : 'Пользователь успешно удален из проекта';
+
+    res.status(200).json({ message, project });
   } catch (err) {
     console.error("Ошибка удаления пользователя из проекта:", err);
     res.status(500).json({ message: 'Ошибка удаления пользователя из проекта', error: err.message });

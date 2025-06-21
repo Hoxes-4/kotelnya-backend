@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createProject, getProjectById } = require('../controllers/projectController');
 const auth = require('../middlewares/authMiddleware');
+const Project = require('../models/Project');
 
 // Все маршруты — защищённые
 router.use(auth);

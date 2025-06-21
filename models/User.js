@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -19,7 +20,10 @@ const userSchema = new mongoose.Schema({
   avatarUrl: {
     type: String,
     default: '',
-  },projectInvitations: [
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  projectInvitations: [
     {
       projectId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -57,6 +61,22 @@ userSchema.pre('save', async function (next) {
 // Проверка пароля при входе
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.getResetPasswordToken = function() {
+  // Генерируем случайный токен
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Хэшируем токен и сохраняем его в схеме User (для безопасности)
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Устанавливаем срок действия токена (например, 1 час)
+  this.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 час
+
+  return resetToken; // Возвращаем нехэшированный токен для отправки по email
 };
 
 module.exports = mongoose.model('User', userSchema);
